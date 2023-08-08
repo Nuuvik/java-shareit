@@ -1,30 +1,26 @@
 package ru.practicum.shareit.item;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.exceptions.UnauthorizedException;
+import ru.practicum.shareit.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import static ru.practicum.shareit.item.ItemMapper.dtoToItem;
+
 
 @Service("itemService")
-@Data
 public class ItemService {
 
-    ItemStorage itemStorage;
-    UserService userService;
+    private final ItemStorage itemStorage;
+    private final UserStorage userStorage;
 
 
     @Autowired
-    public ItemService(@Qualifier("inMemoryItemStorage") ItemStorage itemStorage, UserService userService) {
+    public ItemService(ItemStorage itemStorage, UserStorage userStorage) {
         this.itemStorage = itemStorage;
-        this.userService = userService;
+        this.userStorage = userStorage;
     }
 
 
@@ -33,26 +29,30 @@ public class ItemService {
     }
 
     public Item getItemById(Long itemId) {
-
-        return itemStorage.getItem(itemId);
+        return itemStorage.getItem(itemId)
+                .orElseThrow(NotFoundException::new);
     }
 
     public Item create(ItemDto itemDto, Long userId) {
-        if (!userService.getUsersId().contains(userId)) {
+        if (!userStorage.getUsersId().contains(userId)) {
             throw new NotFoundException();
         }
-        Item item = dtoToItem(null, itemDto, userId);
+        Item item = ItemMapper.dtoToItem(null, itemDto, userId);
         itemStorage.save(item);
         return item;
     }
 
     public Item update(Long id, ItemDto itemDto, Long userId) {
-        if (!Objects.equals(itemStorage.getItem(id).getOwner(), userId)) {
-            throw new NotFoundException();
+        Item item = ItemMapper.dtoToItem(id, itemDto, userId);
+
+        Item existingItem = itemStorage.getItem(id).orElseThrow(NotFoundException::new);
+
+        if (!existingItem.getOwner().equals(userId)) {
+            throw new UnauthorizedException("Вы не имеете права обновлять эту вещь");
         }
-        Item item = dtoToItem(id, itemDto, userId);
         itemStorage.update(id, item, userId);
-        return itemStorage.getItem(id);
+        return itemStorage.getItem(id)
+                .orElseThrow(NotFoundException::new);
     }
 
     public void delete(Long id) {
@@ -60,15 +60,6 @@ public class ItemService {
     }
 
     public List<Item> getItemsByTextSearch(String text) {
-        List<Item> list = new ArrayList<>();
-        if (text.isBlank()) {
-            return list;
-        }
-        for (Item item : itemStorage.getItems()) {
-            if ((item.getAvailable()) && ((item.getDescription().toLowerCase().contains(text.toLowerCase())) || (item.getName().toLowerCase().contains(text.toLowerCase())))) {
-                list.add(item);
-            }
-        }
-        return list;
+        return itemStorage.getItemsByTextSearch(text);
     }
 }

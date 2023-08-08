@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemStorage {
     void save(Item item);
@@ -9,10 +10,10 @@ public interface ItemStorage {
 
     void delete(Long id);
 
-    Item getItem(Long id);
+    Optional<Item> getItem(Long id);
 
     List<Item> getItemsByUserId(Long userId);
 
-    List<Item> getItems();
+    List<Item> getItemsByTextSearch(String text);
 
 }

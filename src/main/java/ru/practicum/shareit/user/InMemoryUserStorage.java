@@ -5,22 +5,15 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Component("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
-    HashMap<Long, User> userRepository = new HashMap<>();
+    private Map<Long, User> userRepository = new HashMap<>();
 
-    HashSet<String> emails = new HashSet<>();
-    long generatorId = 0;
-
-    public long generateId() {
-        return ++generatorId;
-    }
+    private Set<String> emails = new HashSet<>();
+    private long generatorId = 0;
 
     @Override
     public void save(User user) {
@@ -38,7 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (!userRepository.containsKey(id)) {
             throw new NotFoundException();
         }
-        if (user.getEmail() != null) {
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
             if ((emails.contains(user.getEmail())) && !(userRepository.get(id).getEmail().equals(user.getEmail()))) {
                 throw new EmailAlreadyExistsException();
             }
@@ -46,7 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
             userRepository.get(id).setEmail(user.getEmail());
             emails.add(user.getEmail());
         }
-        if (user.getName() != null) {
+        if (user.getName() != null && !user.getName().isBlank()) {
             userRepository.get(id).setName(user.getName());
         }
     }
@@ -63,11 +56,8 @@ public class InMemoryUserStorage implements UserStorage {
 
 
     @Override
-    public User getUser(Long id) {
-        if (!userRepository.containsKey(id)) {
-            throw new NotFoundException();
-        }
-        return userRepository.get(id);
+    public Optional<User> getUser(Long id) {
+        return Optional.ofNullable(userRepository.get(id));
     }
 
     @Override
@@ -78,5 +68,9 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<Long> getUsersId() {
         return new ArrayList<>(userRepository.keySet());
+    }
+
+    private long generateId() {
+        return ++generatorId;
     }
 }

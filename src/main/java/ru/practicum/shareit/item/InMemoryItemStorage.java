@@ -4,21 +4,16 @@ import lombok.Data;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.NotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Component("inMemoryItemStorage")
 public class InMemoryItemStorage implements ItemStorage {
 
-    HashMap<Long, Item> itemRepository = new HashMap<>();
+    private Map<Long, Item> itemRepository = new HashMap<>();
 
-    long generatorId = 0;
-
-    public long generateId() {
-        return ++generatorId;
-    }
+    private long generatorId = 0;
 
     @Override
     public void save(Item item) {
@@ -27,38 +22,35 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public void update(Long id, Item item, Long userId) {
-
-        if (!itemRepository.containsKey(id)) {
-            throw new NotFoundException();
+    public void update(Long id, Item updatedItem, Long userId) {
+        Item item = itemRepository.get(id);
+        if (item == null) {
+            throw new NotFoundException("Вещь не найдена");
         }
 
-        if (item.getName() != null) {
-            itemRepository.get(id).setName(item.getName());
+        if (updatedItem.getName() != null && !updatedItem.getName().isBlank()) {
+            item.setName(updatedItem.getName());
         }
-        if (item.getAvailable() != null) {
-            itemRepository.get(id).setAvailable(item.getAvailable());
+        if (updatedItem.getAvailable() != null) {
+            item.setAvailable(updatedItem.getAvailable());
         }
-        if (item.getDescription() != null) {
-            itemRepository.get(id).setDescription(item.getDescription());
+        if (updatedItem.getDescription() != null && !updatedItem.getDescription().isBlank()) {
+            item.setDescription(updatedItem.getDescription());
         }
     }
 
     @Override
     public void delete(Long id) {
-        if (!itemRepository.containsKey(id)) {
-            throw new NotFoundException();
+        Item item = itemRepository.remove(id);
+        if (item == null) {
+            throw new NotFoundException("Вещь не найдена");
         }
-        itemRepository.remove(id);
     }
 
 
     @Override
-    public Item getItem(Long id) {
-        if (!itemRepository.containsKey(id)) {
-            throw new NotFoundException();
-        }
-        return itemRepository.get(id);
+    public Optional<Item> getItem(Long id) {
+        return Optional.ofNullable(itemRepository.get(id));
     }
 
     @Override
@@ -72,8 +64,21 @@ public class InMemoryItemStorage implements ItemStorage {
         return list;
     }
 
-    public List<Item> getItems() {
-        return new ArrayList<>(itemRepository.values());
+    @Override
+    public List<Item> getItemsByTextSearch(String text) {
+        if (text.isBlank()) {
+            return List.of();
+        }
+
+        return itemRepository.values().stream()
+                .filter(item -> item.getAvailable() &&
+                        (item.getDescription().toLowerCase().contains(text.toLowerCase()) ||
+                                item.getName().toLowerCase().contains(text.toLowerCase())))
+                .collect(Collectors.toList());
+    }
+
+    private long generateId() {
+        return ++generatorId;
     }
 
 }

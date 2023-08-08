@@ -1,11 +1,14 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 
-@Component
+import java.util.List;
+import java.util.stream.Collectors;
+
+@UtilityClass
 public class ItemMapper {
 
-    public static ItemDto itemToDto(Item item) {
+    public ItemDto itemToDto(Item item) {
         return new ItemDto(
                 item.getName(),
                 item.getDescription(),
@@ -14,7 +17,7 @@ public class ItemMapper {
         );
     }
 
-    public static Item dtoToItem(Long id, ItemDto itemDto, Long userId) {
+    public Item dtoToItem(Long id, ItemDto itemDto, Long userId) {
         return new Item(
                 id,
                 itemDto.getName(),
@@ -23,5 +26,11 @@ public class ItemMapper {
                 userId,
                 itemDto.getRequest()
         );
+    }
+
+    public List<ItemDto> itemListToDto(List<Item> items) {
+        return items.stream()
+                .map(ItemMapper::itemToDto)
+                .collect(Collectors.toList());
     }
 }

@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.config.Create;
+import ru.practicum.shareit.config.Update;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
@@ -16,7 +16,7 @@ import java.util.List;
 @Validated
 public class ItemController {
 
-    ItemService itemService;
+    private final ItemService itemService;
 
     @Autowired
     public ItemController(ItemService itemService) {
@@ -30,25 +30,25 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public Item getItemById(@PathVariable(required = false) @NotNull Long itemId) {
+    public Item getItemById(@PathVariable Long itemId) {
         log.info("получен запрос GET /items/id");
         return itemService.getItemById(itemId);
     }
 
     @GetMapping("/search")
-    public List<Item> getItemById(@RequestParam String text) {
+    public List<Item> getItemByTextSearch(@RequestParam String text) {
         log.info("получен запрос GET /items/search");
         return itemService.getItemsByTextSearch(text);
     }
 
     @PostMapping()
-    public Item create(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public Item create(@RequestBody @Validated(Create.class) ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("получен запрос POST /items");
         return itemService.create(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public Item update(@PathVariable @NotNull Long itemId, @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public Item update(@PathVariable Long itemId, @RequestBody @Validated(Update.class) ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.debug("получен запрос PATCH /items");
         return itemService.update(itemId, itemDto, userId);
     }
