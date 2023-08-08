@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.Data;
 import ru.practicum.shareit.config.Create;
-import ru.practicum.shareit.config.Update;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
