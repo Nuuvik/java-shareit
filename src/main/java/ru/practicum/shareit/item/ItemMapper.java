@@ -12,8 +12,7 @@ public class ItemMapper {
         return new ItemDto(
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable(),
-                item.getRequest()
+                item.getAvailable()
         );
     }
 
@@ -23,8 +22,7 @@ public class ItemMapper {
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
-                userId,
-                itemDto.getRequest()
+                userId
         );
     }
 

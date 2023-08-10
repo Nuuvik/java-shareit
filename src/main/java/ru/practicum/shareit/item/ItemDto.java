@@ -2,8 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.Data;
 import ru.practicum.shareit.config.Create;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.config.Update;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -19,22 +18,18 @@ public class ItemDto {
     @NotBlank(groups = {Create.class})
     private String name;
 
-    @Size(max = 200, message = "максимальная длина описания - 200 символов")
+    @Size(max = 200, message = "максимальная длина описания - 200 символов", groups = {Create.class, Update.class})
     @NotBlank(groups = {Create.class})
     private String description;
     @NotNull(groups = {Create.class})
     private Boolean available;
 
 
-    private User owner;
-
-    private ItemRequest request;
-
-    public ItemDto(String name, String description, Boolean available, ItemRequest request) {
+    public ItemDto(String name, String description, Boolean available) {
         this.name = name;
         this.description = description;
         this.available = available;
-        this.request = request;
+
     }
 
 

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.config.Create;
 import ru.practicum.shareit.config.Update;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -47,14 +46,14 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@PathVariable @NotNull Long userId, @RequestBody @Validated(Update.class) UserDto userDto) {
+    public UserDto update(@PathVariable Long userId, @RequestBody @Validated(Update.class) UserDto userDto) {
         log.debug("получен запрос PATCH /users");
         User user = userService.update(userId, userDto);
         return UserMapper.userToDto(user);
     }
 
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable @NotNull Long userId) {
+    public void delete(@PathVariable Long userId) {
         log.debug("получен запрос DELETE /users");
         userService.delete(userId);
     }

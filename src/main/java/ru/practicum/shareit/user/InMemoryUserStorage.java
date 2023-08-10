@@ -1,13 +1,11 @@
 package ru.practicum.shareit.user;
 
-import lombok.Data;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 
 import java.util.*;
 
-@Data
 @Component("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
     private Map<Long, User> userRepository = new HashMap<>();

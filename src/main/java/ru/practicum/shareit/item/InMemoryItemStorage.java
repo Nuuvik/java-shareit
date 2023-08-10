@@ -1,13 +1,11 @@
 package ru.practicum.shareit.item;
 
-import lombok.Data;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.NotFoundException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Data
 @Component("inMemoryItemStorage")
 public class InMemoryItemStorage implements ItemStorage {
 
@@ -66,14 +64,15 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public List<Item> getItemsByTextSearch(String text) {
+        String searchText = text.toLowerCase();
         if (text.isBlank()) {
             return List.of();
         }
 
         return itemRepository.values().stream()
                 .filter(item -> item.getAvailable() &&
-                        (item.getDescription().toLowerCase().contains(text.toLowerCase()) ||
-                                item.getName().toLowerCase().contains(text.toLowerCase())))
+                        (item.getDescription().toLowerCase().contains(searchText) ||
+                                item.getName().toLowerCase().contains(searchText)))
                 .collect(Collectors.toList());
     }
 
