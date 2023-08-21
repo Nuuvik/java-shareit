@@ -1,15 +1,22 @@
 package ru.practicum.shareit.item;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.config.Create;
 import ru.practicum.shareit.config.Update;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemDto {
 
     private Long id;
@@ -24,13 +31,15 @@ public class ItemDto {
     @NotNull(groups = {Create.class})
     private Boolean available;
 
+    private Long owner;
 
-    public ItemDto(String name, String description, Boolean available) {
-        this.name = name;
-        this.description = description;
-        this.available = available;
+    private Long request;
 
-    }
+    private Booking lastBooking;
+
+    private Booking nextBooking;
+
+    private List<CommentDto> comments = new ArrayList<>();
 
 
 }

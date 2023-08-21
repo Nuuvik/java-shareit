@@ -15,9 +15,9 @@ public class UserMapper {
         );
     }
 
-    public User dtoToUser(Long id, UserDto userDto) {
+    public User dtoToUser(UserDto userDto) {
         return new User(
-                id,
+                userDto.getId(),
                 userDto.getName(),
                 userDto.getEmail()
         );
@@ -27,6 +27,14 @@ public class UserMapper {
         return users.stream()
                 .map(UserMapper::userToDto)
                 .collect(Collectors.toList());
+    }
+
+    public static User mapToNewUser(UserDto userDto) {
+        User user = new User();
+        user.setId(userDto.getId());
+        user.setEmail(userDto.getEmail());
+        user.setName(userDto.getName());
+        return user;
     }
 
 
