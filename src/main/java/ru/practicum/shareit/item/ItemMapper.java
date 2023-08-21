@@ -1,34 +1,35 @@
 package ru.practicum.shareit.item;
 
-import lombok.experimental.UtilityClass;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
-@UtilityClass
+@Component
+@AllArgsConstructor
 public class ItemMapper {
 
-    public ItemDto itemToDto(Item item) {
+    public static ItemDto itemToDto(Item item) {
         return new ItemDto(
+                item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable()
+                item.getAvailable(),
+                item.getOwner(),
+                item.getRequest(),
+                null,
+                null,
+                new ArrayList<>()
         );
     }
 
-    public Item dtoToItem(Long id, ItemDto itemDto, Long userId) {
-        return new Item(
-                id,
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable(),
-                userId
-        );
-    }
-
-    public List<ItemDto> itemListToDto(List<Item> items) {
-        return items.stream()
-                .map(ItemMapper::itemToDto)
-                .collect(Collectors.toList());
+    public static Item mapToNewItem(ItemDto itemDto, Long id) {
+        Item item = new Item();
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setAvailable(itemDto.getAvailable());
+        item.setOwner(id);
+        item.setRequest(itemDto.getRequest());
+        return item;
     }
 }

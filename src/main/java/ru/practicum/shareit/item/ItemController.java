@@ -24,15 +24,15 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<Item> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("получен запрос GET /items");
         return itemService.getItemsByUserId(userId);
     }
 
     @GetMapping("/{itemId}")
-    public Item getItemById(@PathVariable Long itemId) {
+    public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("получен запрос GET /items/id");
-        return itemService.getItemById(itemId);
+        return itemService.getItemDtoByItemId(itemId, userId);
     }
 
     @GetMapping("/search")
@@ -51,5 +51,11 @@ public class ItemController {
     public Item update(@PathVariable Long itemId, @RequestBody @Validated(Update.class) ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.debug("получен запрос PATCH /items");
         return itemService.update(itemId, itemDto, userId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody CommentDto commentDto) {
+        log.info("поулчен запрос POST /items/id/comment");
+        return itemService.addComment(itemId, userId, commentDto);
     }
 }

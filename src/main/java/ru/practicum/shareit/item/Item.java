@@ -1,13 +1,23 @@
 package ru.practicum.shareit.item;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 
 
 @Data
 @Builder
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "items", schema = "public")
 public class Item {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -16,14 +26,11 @@ public class Item {
 
     private Boolean available;
 
+    @Column(name = "owner_id")
     private Long owner;
 
+    @Column(name = "request_id")
+    private Long request;
 
-    public Item(Long id, String name, String description, Boolean available, Long owner) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-        this.owner = owner;
-    }
+
 }

@@ -8,6 +8,7 @@ import ru.practicum.shareit.config.Create;
 import ru.practicum.shareit.config.Update;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -31,24 +32,23 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUsersById(@PathVariable Long userId) {
+    public Optional<User> getUsersById(@PathVariable Long userId) {
         log.info("получен запрос GET /users/id");
-        User user = userService.getUsersById(userId);
-        return UserMapper.userToDto(user);
+        return userService.getUsersById(userId);
+
     }
 
 
     @PostMapping()
     public UserDto create(@RequestBody @Validated(Create.class) UserDto userDto) {
         log.info("получен запрос POST /users");
-        User user = userService.create(userDto);
-        return UserMapper.userToDto(user);
+        return userService.create(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto update(@PathVariable Long userId, @RequestBody @Validated(Update.class) UserDto userDto) {
         log.debug("получен запрос PATCH /users");
-        User user = userService.update(userId, userDto);
+        User user = userService.updateUser(userId, userDto);
         return UserMapper.userToDto(user);
     }
 
