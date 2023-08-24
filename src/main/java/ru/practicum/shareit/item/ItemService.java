@@ -12,12 +12,14 @@ import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.item.CommentMapper.commentToDto;
 import static ru.practicum.shareit.item.CommentMapper.mapToNewComment;
-import static ru.practicum.shareit.item.ItemMapper.itemToDto;
 import static ru.practicum.shareit.item.ItemMapper.mapToNewItem;
 
 
@@ -32,22 +34,25 @@ public class ItemService {
     private final BookingRepository bookingRepository;
 
     private final CommentRepository commentRepository;
+    private final ItemMapper itemMapper;
 
     @Transactional(readOnly = true)
     public List<ItemDto> getItemsByUserId(Long userId) {
-        List<Item> list = itemRepository.findByOwnerOrderById(userId);
-        List<ItemDto> result = new ArrayList<>();
-        for (Item item : list) {
-            ItemDto itemDto = itemToDto(item);
-            if (!bookingRepository.findByItemIdAndStartAfterAndStatusOrderByStartAsc(item.getId(), LocalDateTime.now(), Status.APPROVED).isEmpty()) {
-                itemDto.setNextBooking(bookingRepository.findByItemIdAndStartAfterAndStatusOrderByStartAsc(item.getId(), LocalDateTime.now(), Status.APPROVED).get(0));
-            }
-            if (!bookingRepository.findByItemIdAndStartBeforeAndStatusOrderByEndDesc(item.getId(), LocalDateTime.now(), Status.APPROVED).isEmpty()) {
-                itemDto.setLastBooking(bookingRepository.findByItemIdAndStartBeforeAndStatusOrderByEndDesc(item.getId(), LocalDateTime.now(), Status.APPROVED).get(0));
-            }
-            result.add(itemDto);
+        List<Item> items = new ArrayList<>(itemRepository.findByOwnerOrderById(userId));
+        if (items.isEmpty()) {
+            return new ArrayList<>();
         }
-        return result;
+        List<ItemDto> itemsDto = items.stream()
+                .map(itemMapper::itemToDto)
+                .collect(Collectors.toList());
+        for (ItemDto itemDto : itemsDto) {
+            Long itemDtoId = itemDto.getId();
+            if (Objects.equals(userId, itemDto.getOwner())) {
+                itemDto.setLastBooking(getLastBookingForItem(itemDtoId));
+                itemDto.setNextBooking(getFutureBookingFotItem(itemDtoId));
+            }
+        }
+        return itemsDto;
     }
 
     @Transactional(readOnly = true)
@@ -66,17 +71,13 @@ public class ItemService {
     @Transactional(readOnly = true)
     public ItemDto getItemDtoByItemId(Long itemId, Long userId) {
         Item item = getItemById(itemId);
-        ItemDto itemDto = itemToDto(item);
+        ItemDto itemDto = itemMapper.itemToDto(item);
         if (item.getOwner().equals(userId)) {
-            if (!bookingRepository.findByItemIdAndStartAfterAndStatusOrderByStartAsc(itemId, LocalDateTime.now(), Status.APPROVED).isEmpty()) {
-                itemDto.setNextBooking(bookingRepository.findByItemIdAndStartAfterAndStatusOrderByStartAsc(itemId, LocalDateTime.now(), Status.APPROVED).get(0));
-            }
-            if (!bookingRepository.findByItemIdAndStartBeforeAndStatusOrderByEndDesc(itemId, LocalDateTime.now(), Status.APPROVED).isEmpty()) {
-                itemDto.setLastBooking(bookingRepository.findByItemIdAndStartBeforeAndStatusOrderByEndDesc(itemId, LocalDateTime.now(), Status.APPROVED).get(0));
-            }
+            itemDto.setLastBooking(getLastBookingForItem(itemId));
+            itemDto.setNextBooking(getFutureBookingFotItem(itemId));
         }
-        if (commentRepository.findByItem_IdOrderByCreatedDesc(itemId) != null) {
-            List<Comment> list = (commentRepository.findByItem_IdOrderByCreatedDesc(itemId));
+        if (commentRepository.findByItemIdOrderByCreatedDesc(itemId) != null) {
+            List<Comment> list = (commentRepository.findByItemIdOrderByCreatedDesc(itemId));
             List<CommentDto> commentDtoList = new ArrayList<>();
             for (Comment comment : list) {
                 commentDtoList.add(commentToDto(comment));
@@ -115,17 +116,16 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<Item> getItemsByTextSearch(String text) {
+    public List<ItemDto> getItemsByTextSearch(String text) {
         List<Item> list = new ArrayList<>();
         if (text.isBlank()) {
-            return list;
+            return new ArrayList<>();
         }
-        for (Item item : itemRepository.findAll()) {
-            if ((item.getAvailable()) && ((item.getDescription().toLowerCase().contains(text.toLowerCase())) || (item.getName().toLowerCase().contains(text.toLowerCase())))) {
-                list.add(item);
-            }
-        }
-        return list;
+        String query = "%" + text.trim().toLowerCase() + "%";
+        return new ArrayList<>(itemRepository.findByNameOrDescription(query)
+                .stream()
+                .map(itemMapper::itemToDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)));
     }
 
     public CommentDto addComment(Long itemId, Long userId, CommentDto commentDto) {
@@ -139,17 +139,47 @@ public class ItemService {
             throw new NotFoundException();
         }
         List<Booking> list = bookingRepository.findByBookerIdAndStatusAndEndBeforeOrderByIdDesc(userId, Status.APPROVED, LocalDateTime.now());
-        boolean bool = false;
+        boolean isItemBookingDetected = false;
         for (Booking booking : list) {
             if (booking.getItem().getId().equals(itemId)) {
-                bool = true;
+                isItemBookingDetected = true;
                 break;
             }
         }
-        if (bool) {
+        if (isItemBookingDetected) {
             Comment comment = mapToNewComment(commentDto, userRepository.findById(userId).get(), itemRepository.findById(itemId).get());
             return commentToDto(commentRepository.save(comment));
         } else throw new WrongEntityException();
 
+    }
+
+    private ItemBookingDto getLastBookingForItem(Long itemId) {
+        List<Booking> bookings = bookingRepository.findByItemIdAndStartBeforeAndStatusOrderByEndDesc(itemId,
+                LocalDateTime.now(), Status.APPROVED);
+        if (bookings.isEmpty()) {
+            return null;
+        }
+        Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd).reversed();
+        List<Booking> bookingsSorted = bookings.stream()
+                .sorted(byDateEnd)
+                .limit(1)
+                .collect(Collectors.toList());
+        Booking booking = bookingsSorted.get(0);
+        return new ItemBookingDto(booking.getId(), booking.getBooker().getId());
+    }
+
+    private ItemBookingDto getFutureBookingFotItem(Long itemId) {
+        List<Booking> bookings = bookingRepository.findByItemIdAndStartAfterAndStatusOrderByStartAsc(itemId,
+                LocalDateTime.now(), Status.APPROVED);
+        if (bookings.isEmpty()) {
+            return null;
+        }
+        Comparator<Booking> byDateStart = Comparator.comparing(Booking::getStart);
+        List<Booking> bookingsOrdered = bookings.stream()
+                .sorted(byDateStart)
+                .limit(1)
+                .collect(Collectors.toList());
+        Booking booking = bookingsOrdered.get(0);
+        return new ItemBookingDto(booking.getId(), booking.getBooker().getId());
     }
 }

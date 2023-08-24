@@ -1,9 +1,9 @@
 package ru.practicum.shareit.booking;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.user.User;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class BookingDto {
 
     private Long id;
@@ -30,7 +31,6 @@ public class BookingDto {
 
     private Item item;
 
-    private User booker;
     @Enumerated(EnumType.STRING)
     private Status status;
 }

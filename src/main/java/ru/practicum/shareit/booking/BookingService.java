@@ -16,9 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static ru.practicum.shareit.booking.BookingMapper.mapToNewBooking;
 
-@Service("bookingService")
+@Service
 @RequiredArgsConstructor
 @Transactional
 public class BookingService {
@@ -26,6 +25,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ItemService itemService;
     private final UserService userService;
+    private final BookingMapper bookingMapper;
 
     @Transactional(readOnly = true)
     public List<Booking> getBookings() {
@@ -48,7 +48,12 @@ public class BookingService {
     public Booking saveBooking(BookingDto bookingDto, Long id) {
         Item item = itemService.getItemById(bookingDto.getItemId());
         User user = userService.getUsersById(id).get();
-        Booking booking = mapToNewBooking(bookingDto, user, item);
+
+        if (!(bookingDto.getEnd().isAfter(bookingDto.getStart()))) {
+            throw new WrongEntityException("End of the booking can't be early than start");
+        }
+
+        Booking booking = bookingMapper.mapToNewBooking(bookingDto, user, item);
 
         if (!itemService.findUserById(id)) {
             throw new NotFoundException();

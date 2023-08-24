@@ -9,7 +9,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class ItemMapper {
 
-    public static ItemDto itemToDto(Item item) {
+    public ItemDto itemToDto(Item item) {
         return new ItemDto(
                 item.getId(),
                 item.getName(),
