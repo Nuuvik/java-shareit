@@ -117,7 +117,6 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemDto> getItemsByTextSearch(String text) {
-        List<Item> list = new ArrayList<>();
         if (text.isBlank()) {
             return new ArrayList<>();
         }
