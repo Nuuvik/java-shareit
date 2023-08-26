@@ -3,33 +3,28 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-
 @Component
 @AllArgsConstructor
 public class ItemMapper {
 
     public ItemDto itemToDto(Item item) {
-        return new ItemDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable(),
-                item.getOwner(),
-                item.getRequest(),
-                null,
-                null,
-                new ArrayList<>()
-        );
+        return ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .owner(item.getOwner())
+                .request(item.getRequest())
+                .build();
     }
 
     public static Item mapToNewItem(ItemDto itemDto, Long id) {
-        Item item = new Item();
-        item.setName(itemDto.getName());
-        item.setDescription(itemDto.getDescription());
-        item.setAvailable(itemDto.getAvailable());
-        item.setOwner(id);
-        item.setRequest(itemDto.getRequest());
-        return item;
+        return Item.builder()
+                .name(itemDto.getName())
+                .description(itemDto.getDescription())
+                .available(itemDto.getAvailable())
+                .owner(id)
+                .request(itemDto.getRequest())
+                .build();
     }
 }

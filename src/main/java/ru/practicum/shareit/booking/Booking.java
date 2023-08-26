@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "bookings", schema = "public")
+@Table(name = "bookings")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +31,7 @@ public class Booking {
 
     @Column(name = "start_date")
     private LocalDateTime start;
+
     @Column(name = "end_date")
     private LocalDateTime end;
 

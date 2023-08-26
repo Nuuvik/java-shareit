@@ -29,13 +29,5 @@ public class UserMapper {
                 .collect(Collectors.toList());
     }
 
-    public static User mapToNewUser(UserDto userDto) {
-        User user = new User();
-        user.setId(userDto.getId());
-        user.setEmail(userDto.getEmail());
-        user.setName(userDto.getName());
-        return user;
-    }
-
 
 }

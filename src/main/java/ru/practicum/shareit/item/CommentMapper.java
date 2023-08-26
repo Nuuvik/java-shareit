@@ -11,22 +11,22 @@ import java.time.LocalDateTime;
 public class CommentMapper {
 
     public static CommentDto commentToDto(Comment comment) {
-        return new CommentDto(
-                comment.getId(),
-                comment.getText(),
-                comment.getItem(),
-                comment.getAuthor(),
-                comment.getCreated(),
-                comment.getAuthor().getName()
-        );
+        return CommentDto.builder()
+                .id(comment.getId())
+                .text(comment.getText())
+                .item(comment.getItem())
+                .author(comment.getAuthor())
+                .created(comment.getCreated())
+                .authorName(comment.getAuthor().getName())
+                .build();
     }
 
     public static Comment mapToNewComment(CommentDto commentDto, User user, Item item) {
-        Comment comment = new Comment();
-        comment.setText(commentDto.getText());
-        comment.setCreated(LocalDateTime.now());
-        comment.setItem(item);
-        comment.setAuthor(user);
-        return comment;
+        return Comment.builder()
+                .text(commentDto.getText())
+                .created(LocalDateTime.now())
+                .item(item)
+                .author(user)
+                .build();
     }
 }

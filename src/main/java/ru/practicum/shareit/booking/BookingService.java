@@ -86,24 +86,24 @@ public class BookingService {
             throw new NotFoundException();
         }
         switch (state) {
-            case "ALL": {
+            case "ALL":
                 return bookingRepository.findByBookerIdOrderByIdDesc(userId);
-            }
-            case "CURRENT": {
+
+            case "CURRENT":
                 return bookingRepository.findByBookerIdAndEndAfterAndStartBeforeOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now());
-            }
-            case "PAST": {
+
+            case "PAST":
                 return bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
-            }
-            case "FUTURE": {
+
+            case "FUTURE":
                 return bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
-            }
-            case "WAITING": {
+
+            case "WAITING":
                 return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
-            }
-            case "REJECTED": {
+
+            case "REJECTED":
                 return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
-            }
+
             default:
                 throw new UnknownStateException("Unknown state: UNSUPPORTED_STATUS");
         }

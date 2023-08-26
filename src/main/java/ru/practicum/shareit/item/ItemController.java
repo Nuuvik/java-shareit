@@ -40,7 +40,7 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("request received GET /items/id");
-        return itemService.getItemDtoByItemId(itemId, userId);
+        return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping("/search")
@@ -49,7 +49,7 @@ public class ItemController {
         return itemService.getItemsByTextSearch(text);
     }
 
-    @PostMapping()
+    @PostMapping
     public Item create(@RequestBody @Validated(Create.class) ItemDto itemDto, @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("request received POST /items");
         return itemService.create(itemDto, userId);

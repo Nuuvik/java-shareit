@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.config.Create;
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ItemDto {
 
     private Long id;
@@ -27,6 +29,7 @@ public class ItemDto {
     @Size(max = 200, message = "the maximum length of the description is 200 characters", groups = {Create.class, Update.class})
     @NotBlank(groups = {Create.class})
     private String description;
+
     @NotNull(groups = {Create.class})
     private Boolean available;
 

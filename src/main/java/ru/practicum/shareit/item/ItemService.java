@@ -69,7 +69,7 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public ItemDto getItemDtoByItemId(Long itemId, Long userId) {
+    public ItemDto getItemById(Long itemId, Long userId) {
         Item item = getItemById(itemId);
         ItemDto itemDto = itemMapper.itemToDto(item);
         if (item.getOwner().equals(userId)) {

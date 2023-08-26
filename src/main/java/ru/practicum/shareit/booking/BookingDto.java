@@ -21,9 +21,11 @@ public class BookingDto {
     @NotNull
     @FutureOrPresent
     private LocalDateTime start;
+
     @NotNull
     @FutureOrPresent
     private LocalDateTime end;
+
     @NotNull
     private Long itemId;
 

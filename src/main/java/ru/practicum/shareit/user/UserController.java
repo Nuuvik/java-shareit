@@ -46,7 +46,7 @@ public class UserController {
     }
 
 
-    @PostMapping()
+    @PostMapping
     public UserDto create(@RequestBody @Validated(Create.class) UserDto userDto) {
         log.info("request received POST /users");
         return userService.create(userDto);

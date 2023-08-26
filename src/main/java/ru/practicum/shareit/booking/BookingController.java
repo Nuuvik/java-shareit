@@ -31,7 +31,7 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    @PostMapping()
+    @PostMapping
     public Booking create(@RequestBody @Valid BookingDto bookingDto, @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("request received POST /bookings");
         return bookingService.saveBooking(bookingDto, userId);
@@ -49,7 +49,7 @@ public class BookingController {
         return bookingService.getBookingById(bookingId, userId);
     }
 
-    @GetMapping()
+    @GetMapping
     public List<Booking> getBookings(@RequestHeader(USER_ID_HEADER) Long userId, @RequestParam(defaultValue = "ALL") String state) {
         log.info("request received GET /bookings");
         return bookingService.getBookings(userId, state);
