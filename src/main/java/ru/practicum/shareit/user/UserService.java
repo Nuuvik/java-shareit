@@ -1,50 +1,64 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service("userService")
+@RequiredArgsConstructor
 public class UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
-
-
+    @Transactional(readOnly = true)
     public List<User> getUsers() {
-        return userStorage.getUsers();
+        return userRepository.findAll();
     }
 
-    public List<Long> getUsersId() {
-        return userStorage.getUsersId();
+    @Transactional(readOnly = true)
+    public Boolean isExistUserById(Long userId) {
+        return userRepository.existsById(userId);
     }
 
-    public User getUsersById(Long userId) {
-        return userStorage.getUser(userId)
-                .orElseThrow(NotFoundException::new);
+    @Transactional(readOnly = true)
+    public UserDto getUserDtoByUserId(Long userId) {
+        User user = getUsersById(userId).get();
+        return UserMapper.userToDto(user);
     }
 
-    public User create(UserDto userDto) {
-        User user = UserMapper.dtoToUser(null, userDto);
-        userStorage.save(user);
-        return user;
+    @Transactional(readOnly = true)
+    public Optional<User> getUsersById(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException();
+        }
+        return userRepository.findById(userId);
     }
 
-    public User update(Long id, UserDto userDto) {
-        User user = UserMapper.dtoToUser(id, userDto);
-        userStorage.update(id, user);
-        return userStorage.getUser(id)
-                .orElseThrow(NotFoundException::new);
+    @Transactional
+    public UserDto create(UserDto userDto) {
+        User user = UserMapper.dtoToUser(userDto);
+
+        return UserMapper.userToDto(userRepository.save(user));
     }
 
-    public void delete(Long id) {
-        userStorage.delete(id);
+    public User updateUser(Long id, UserDto userDto) {
+        if (!userRepository.existsById(id)) {
+            throw new NotFoundException();
+        }
+        User user = userRepository.findById(id).get();
+        return userRepository.save(new User(
+                id,
+                userDto.getName() != null ? userDto.getName() : user.getName(),
+                userDto.getEmail() != null ? userDto.getEmail() : user.getEmail()
+        ));
+    }
+
+    public void delete(Long userId) {
+        userRepository.delete(userRepository.findById(userId).get());
     }
 }

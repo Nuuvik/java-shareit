@@ -13,7 +13,7 @@ public class ItemRequest {
 
     private Long id;
 
-    @Size(max = 200, message = "максимальная длина описания - 200 символов")
+    @Size(max = 200, message = "the maximum length of the description is 200 characters")
     private String description;
 
     private User requestor;

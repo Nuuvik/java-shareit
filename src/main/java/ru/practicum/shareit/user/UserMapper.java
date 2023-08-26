@@ -15,9 +15,9 @@ public class UserMapper {
         );
     }
 
-    public User dtoToUser(Long id, UserDto userDto) {
+    public User dtoToUser(UserDto userDto) {
         return new User(
-                id,
+                userDto.getId(),
                 userDto.getName(),
                 userDto.getEmail()
         );
