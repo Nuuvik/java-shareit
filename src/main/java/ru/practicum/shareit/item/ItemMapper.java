@@ -1,30 +1,13 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@Component
-@AllArgsConstructor
-public class ItemMapper {
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-    public ItemDto itemToDto(Item item) {
-        return ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .owner(item.getOwner())
-                .request(item.getRequest())
-                .build();
-    }
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
+public interface ItemMapper {
 
-    public static Item mapToNewItem(ItemDto itemDto, Long id) {
-        return Item.builder()
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .owner(id)
-                .request(itemDto.getRequest())
-                .build();
-    }
+    Item toItem(ItemDto itemDto);
+
+    ItemDto toDto(Item item);
 }

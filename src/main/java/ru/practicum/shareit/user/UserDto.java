@@ -2,26 +2,32 @@ package ru.practicum.shareit.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.config.Create;
-import ru.practicum.shareit.config.Update;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
-@Data
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class UserDto {
 
     private Long id;
 
-    @NotBlank(groups = {Create.class})
+    @NotNull
     private String name;
 
-    @Email(groups = {Create.class, Update.class})
-    @NotEmpty(groups = {Create.class})
+    @NotBlank
+    @Email
     private String email;
 
+    @Email
+    private String registrationDate;
 }

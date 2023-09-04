@@ -1,33 +1,24 @@
 package ru.practicum.shareit.user;
 
-import lombok.experimental.UtilityClass;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
-import java.util.List;
-import java.util.stream.Collectors;
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
+public interface UserMapper {
 
-@UtilityClass
-public class UserMapper {
-    public UserDto userToDto(User user) {
-        return new UserDto(
-                user.getId(),
-                user.getName(),
-                user.getEmail()
-        );
+    User toUser(UserDto userDto);
+
+    UserDto toDto(User user);
+
+    @AfterMapping
+    default void linkItems(@MappingTarget User user) {
+        user.getItems().forEach(item -> item.setOwner(user));
     }
 
-    public User dtoToUser(UserDto userDto) {
-        return new User(
-                userDto.getId(),
-                userDto.getName(),
-                userDto.getEmail()
-        );
+    @AfterMapping
+    default void linkComments(@MappingTarget User user) {
+        user.getComments().forEach(c -> c.setAuthor(user));
     }
-
-    public List<UserDto> userListToDto(List<User> users) {
-        return users.stream()
-                .map(UserMapper::userToDto)
-                .collect(Collectors.toList());
-    }
-
-
 }

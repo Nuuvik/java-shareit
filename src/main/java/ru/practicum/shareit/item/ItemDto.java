@@ -2,46 +2,46 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.config.Create;
-import ru.practicum.shareit.config.Update;
+import lombok.Setter;
+import lombok.ToString;
+import ru.practicum.shareit.comment.CommentDto;
+import ru.practicum.shareit.user.UserDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
-@Builder
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class ItemDto {
 
-    private Long id;
+    private long id;
 
-
-    @NotBlank(groups = {Create.class})
+    @NotBlank(message = "Item name absent")
+    @Size(max = 255)
     private String name;
 
-    @Size(max = 200, message = "the maximum length of the description is 200 characters", groups = {Create.class, Update.class})
-    @NotBlank(groups = {Create.class})
+    @NotBlank(message = "Item description absent")
+    @Size(max = 255)
     private String description;
 
-    @NotNull(groups = {Create.class})
-    private Boolean available;
+    @NotNull(message = "Item availability absent")
+    private boolean available;
 
-    private Long owner;
-
-    private Long request;
+    private Long requestId;
 
     private ItemBookingDto lastBooking;
 
     private ItemBookingDto nextBooking;
 
-    private List<CommentDto> comments = new ArrayList<>();
+    private Set<CommentDto> comments;
 
-
+    private UserDto owner;
 }

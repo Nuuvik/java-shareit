@@ -1,22 +1,7 @@
 package ru.practicum.shareit.request;
 
-import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.user.User;
-
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
-
-@Data
-@Builder
+/**
+ * TODO Sprint add-item-requests.
+ */
 public class ItemRequest {
-
-    private Long id;
-
-    @Size(max = 200, message = "the maximum length of the description is 200 characters")
-    private String description;
-
-    private User requestor;
-
-    private LocalDateTime created;
 }
