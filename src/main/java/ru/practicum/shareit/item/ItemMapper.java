@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
