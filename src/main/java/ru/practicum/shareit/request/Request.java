@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,7 +41,6 @@ public class Request {
 
     @ManyToOne
     @JoinColumn(name = "requester_id", nullable = false)
-    @JsonIgnore
     private User requester;
 
     @OneToMany(mappedBy = "request")

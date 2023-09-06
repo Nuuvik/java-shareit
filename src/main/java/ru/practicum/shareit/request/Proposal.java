@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +36,5 @@ public class Proposal {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "request_id")
-    @JsonIgnore
     private Request request;
 }

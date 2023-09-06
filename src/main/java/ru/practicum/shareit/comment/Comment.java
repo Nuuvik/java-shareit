@@ -1,6 +1,5 @@
 package ru.practicum.shareit.comment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,12 +37,10 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    @JsonIgnore
     private User author;
 
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
-    @JsonIgnore
     private Item item;
 
     @Column(name = "created_date", nullable = false)

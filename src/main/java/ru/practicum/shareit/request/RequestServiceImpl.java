@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ItemDoesNotExistException;
 import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class RequestServiceImpl implements RequestService {
         checkRequestExists(requestId);
         Request request = requestRepository.findById(requestId).get();
         RequestWithProposalsDto requestWithProposalsDto = requestMapper.toRequestWithProposalDto(request);
-        requestWithProposalsDto.setItems(itemService.getItemsDtoByRequestId(request.getId()));
+        requestWithProposalsDto.setItems(itemService.getItemsByRequestId(request.getId()));
         return requestWithProposalsDto;
     }
 
@@ -57,7 +57,7 @@ public class RequestServiceImpl implements RequestService {
                 .map(requestMapper::toRequestWithProposalDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
-        requests.forEach(request -> request.setItems(itemService.getItemsDtoByRequestId(request.getId())));
+        requests.forEach(request -> request.setItems(itemService.getItemsByRequestId(request.getId())));
         return requests.stream()
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
@@ -72,7 +72,7 @@ public class RequestServiceImpl implements RequestService {
                 .stream()
                 .map(requestMapper::toRequestWithProposalDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        requests.forEach(rQ -> rQ.setItems(itemService.getItemsDtoByRequestId(rQ.getId())));
+        requests.forEach(rQ -> rQ.setItems(itemService.getItemsByRequestId(rQ.getId())));
 
         return requests.stream()
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));

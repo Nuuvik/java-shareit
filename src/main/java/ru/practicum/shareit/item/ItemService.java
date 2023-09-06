@@ -6,22 +6,21 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.comment.CommentMapper;
-import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.ItemDoesNotExistException;
 import ru.practicum.shareit.exception.NotOwnerException;
-import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -128,36 +127,27 @@ public class ItemService {
 
     public List<ItemDto> searchItem(Long userId, String keyWord, Integer from, Integer size) {
         log.info("Get request for item owned by user with id={} and label={}", userId, keyWord);
+
         if (keyWord.trim().isEmpty()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
+
         checkUserExists(userId);
 
         String query = "%" + keyWord.trim().toLowerCase() + "%";
 
         int firstId = Objects.isNull(from) ? 0 : from;
-        List<ItemDto> itemsDto = new ArrayList<>();
-        if (Objects.isNull(size)) {
-            itemsDto.addAll(itemRepository.findByNameOrDescription(query)
-                    .stream()
-                    .map(itemMapper::toDto)
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)));
-        } else {
-            List<Item> items = itemRepository.findByNameOrDescription(query);
-            int lastId = Math.min((from + size - 1), items.size());
-            itemsDto.addAll(items
-                    .stream()
-                    .map(itemMapper::toDto)
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList))
-                    .subList(firstId, lastId));
+
+        List<ItemDto> itemsDto = itemRepository.findByNameOrDescription(query)
+                .stream()
+                .map(itemMapper::toDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+        if (size != null) {
+            int lastId = Math.min((from + size - 1), itemsDto.size());
+            itemsDto = itemsDto.subList(firstId, lastId);
         }
-        for (ItemDto itemDto : itemsDto) {
-            Long itemDtoId = itemDto.getId();
-            if (Objects.equals(userId, itemDto.getOwner().getId())) {
-                itemDto.setLastBooking(getLastBookingForItem(itemDtoId));
-                itemDto.setNextBooking(getFutureBookingFotItem(itemDtoId));
-            }
-        }
+
         return itemsDto;
     }
 
@@ -222,7 +212,7 @@ public class ItemService {
         return item.orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
     }
 
-    public List<ItemDto> getItemsDtoByRequestId(Long requestId) {
+    public List<ItemDto> getItemsByRequestId(Long requestId) {
         return itemRepository.findByRequestIdOrderById(requestId)
                 .stream()
                 .map(ItemMapper.itemMapper::toDto)

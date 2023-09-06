@@ -9,13 +9,12 @@ import org.springframework.lang.Nullable;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    //    List<Item> findByOwnerId(Long id);
+
 
     @Query("select i from Item i where  i.available = true  and "
             + "(lower(i.name) like lower(:text) or lower(i.description) like lower(:text))")
     List<Item> findByNameOrDescription(@Nullable String text);
 
-//    @Query("select i from Item i where i.owner.id = :ownerId order by i.id  ")
     Page<Item> findByOwnerId(long ownerId, Pageable pageable);
 
     List<Item> findByRequestIdOrderById(Long requestId);
