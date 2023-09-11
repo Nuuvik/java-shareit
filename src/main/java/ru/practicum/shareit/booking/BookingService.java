@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.ItemDoesNotExistException;
@@ -77,22 +78,22 @@ public class BookingService {
         return toDtoWithItemAndBooker(booking);
     }
 
-    public List<BookingDto> getBookingByState(Long ownerId, String state) {
+    public List<BookingDto> getBookingByState(Long ownerId, String state, Pageable pageable) {
         log.info("New request get booking by state");
         checkUserExists(ownerId);
         checkState(state);
         BookingSearchType type = BookingSearchType.valueOf(state);
         BookingSearch bookingSearch = new BookingSearch(bookingRepository);
         List<BookingDto> bookingDtos = bookingSearch
-                .getBookings(ownerId, type)
+                .getBookings(ownerId, type, pageable)
                 .stream()
-                .filter(Objects::nonNull).map(this::toDtoWithItemAndBooker)
+                .map(this::toDtoWithItemAndBooker)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.info("Bookings for owner id: {} and state: {} returned collection: {}", ownerId, state, bookingDtos);
         return bookingDtos;
     }
 
-    public List<BookingDto> getBookingByStateAndOwner(Long ownerId, String state) {
+    public List<BookingDto> getBookingByStateAndOwner(Long ownerId, String state, Pageable pageable) {
         log.info("New request get booking by state and owner");
         checkUserExists(ownerId);
         checkState(state);
@@ -100,9 +101,8 @@ public class BookingService {
         BookingSearch bookingSearch = new BookingSearch(bookingRepository);
 
         List<BookingDto> bookingDtos = bookingSearch
-                .getBookingsByItemsOwner(ownerId, type)
+                .getBookingsByItemsOwner(ownerId, type, pageable)
                 .stream()
-                .filter(Objects::nonNull)
                 .map(this::toDtoWithItemAndBooker)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.info("Bookings for owner id: {} and state: {} returned collection: {}", ownerId, state, bookingDtos);

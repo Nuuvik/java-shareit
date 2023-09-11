@@ -1,38 +1,30 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import ru.practicum.shareit.user.UserDto;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder(toBuilder = true)
-public class UserDto {
-
-    private Long id;
-
-    @NotNull
-    private String name;
+public class RequestDto {
+    private final Long id;
 
     @NotBlank
-    @Email
-    private String email;
+    private final String description;
+
+    @JsonIgnore
+    private final UserDto requester;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss")
-    private LocalDateTime registrationDate;
+    private final LocalDateTime created;
 }
