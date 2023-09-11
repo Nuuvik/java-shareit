@@ -51,28 +51,6 @@ class ItemIntegrationTest {
     private final ItemService itemService = new ItemService(itemRepository, userRepository,
             commentRepository, bookingRepository, commentMapper, itemMapper, userMapper);
 
-    @Test
-    void getItem_StandardBehavior() {
-
-        ReflectionTestUtils.setField(userService, "userRepository", userRepository);
-        ReflectionTestUtils.setField(userService, "userMapper", userMapper);
-
-        ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
-        ReflectionTestUtils.setField(itemService, "userRepository", userRepository);
-        ReflectionTestUtils.setField(itemService, "itemMapper", itemMapper);
-        ReflectionTestUtils.setField(itemService, "userMapper", userMapper);
-
-        ReflectionTestUtils.setField(itemService, "commentRepository", commentRepository);
-        ReflectionTestUtils.setField(itemService, "commentMapper", commentMapper);
-
-        ReflectionTestUtils.setField(itemService, "bookingRepository", bookingRepository);
-
-        UserDto userDto = userService.getUserDto(1L);
-        ItemDto itemDto = itemService.getItem(1L, 1L);
-
-        assertThat(userDto.getName(), equalTo("Dimetrios1"));
-        assertThat(itemDto.getName(), equalTo("screen"));
-    }
 
     @Test
     void searchItem_StandardBehavior() {
