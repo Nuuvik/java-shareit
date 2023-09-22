@@ -29,13 +29,13 @@ public class GatewayBookingController {
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
     private final BookingClient bookingClient;
 
-    private final BookingCheck bookingCheck;
+    private final BookingValidator bookingValidator;
 
     @PostMapping
     public ResponseEntity<Object> bookItem(@RequestHeader(USER_ID_HEADER) long userId,
                                            @RequestBody @Valid BookItemRequestDto requestDto) {
         log.info("Creating booking {}, userId={}", requestDto.toString(), userId);
-        bookingCheck.checkDto(requestDto);
+        bookingValidator.checkDto(requestDto);
         return bookingClient.bookItem(userId, requestDto);
     }
 
@@ -44,7 +44,7 @@ public class GatewayBookingController {
                                          @PathVariable @Positive long bookingId,
                                          @RequestParam Boolean approved) {
         log.info("Update booking {}, userId={}, approved={}", bookingId, userId, approved);
-        bookingCheck.checkApproved(approved);
+        bookingValidator.checkApproved(approved);
         return bookingClient.changeBookingStatus(userId, bookingId, approved);
     }
 

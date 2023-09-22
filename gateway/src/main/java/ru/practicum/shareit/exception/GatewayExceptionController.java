@@ -12,7 +12,7 @@ public class GatewayExceptionController {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseGateway> handleEntityNotFoundException(final BadParameterException e) {
-        log.warn(e.getMessage());
+        log.warn(e.getMessage(), e);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponseGateway(e.getMessage()));
